@@ -214,7 +214,7 @@ La logique métier est isolée dans `src/lib/` et testée avec Vitest (61 tests,
 
 ## 5. Livraison
 
-**Application en ligne :** À REMPLACER — `https://hexascore.vercel.app/`
+**Application en ligne : `https://hexascore.vercel.app/`
 
 **Configuration requise :** aucune. Aucune variable d'environnement, aucun secret.
 
