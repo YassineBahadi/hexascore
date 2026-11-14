@@ -145,7 +145,6 @@ function scoreInnovation(idea: Idea): number {
 /* ---------------------------------------------------------------- */
 
 function buildJustification(
-  idea: Idea,
   scores: Omit<AiSuggestion, 'justification'>,
 ): string {
   const fragments: string[] = [];

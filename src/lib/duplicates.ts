@@ -256,3 +256,4 @@ export function findDuplicateGroup(
 ): DuplicateGroup | null {
   return groups.find((g) => g.ideaIds.includes(ideaId)) ?? null;
 }
+
