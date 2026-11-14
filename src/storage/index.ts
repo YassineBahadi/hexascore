@@ -94,5 +94,51 @@ export function saveScores(scores: Record<string, Score>): void {
   }
 }
 
+
+/* ================================================================ */
+/* SHORTLIST                                                         */
+/* ================================================================ */
+
+const SHORTLIST_KEY = 'hexascore:shortlist:v1';
+
+/**
+ * Charge la shortlist depuis localStorage.
+ * Retourne [] en cas de problème. Filtre les entrées non-string
+ * (protection contre une corruption manuelle dans DevTools).
+ */
+export function loadShortlist(): string[] {
+  if (!STORAGE_AVAILABLE) return [];
+  let raw: string | null;
+  try {
+    raw = window.localStorage.getItem(SHORTLIST_KEY);
+  } catch (err) {
+    console.warn('[storage] lecture shortlist impossible :', err);
+    return [];
+  }
+  if (!raw) return [];
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed.filter((x): x is string => typeof x === 'string');
+}
+
+/** Écrit la shortlist dans localStorage (silencieux en cas d'échec). */
+export function saveShortlist(ids: string[]): void {
+  if (!STORAGE_AVAILABLE) return;
+  try {
+    window.localStorage.setItem(SHORTLIST_KEY, JSON.stringify(ids));
+  } catch (err) {
+    console.warn('[storage] écriture shortlist impossible :', err);
+  }
+}
+
 /** Exposé pour les tests (Vitest) — pas utilisé dans l'app. */
-export const _internal = { SCORES_KEY };
+export const _internal = { SCORES_KEY , SHORTLIST_KEY  };
+
+
