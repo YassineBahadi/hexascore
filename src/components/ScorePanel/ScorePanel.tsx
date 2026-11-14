@@ -128,19 +128,30 @@ export function ScorePanel({
         </header>
 
         <div className="score-panel__body">
-          <p className="score-panel__description">{idea.description}</p>
-
-          <div className="score-panel__meta">
-            {idea.theme && (
-              <span className="score-panel__chip">{idea.theme}</span>
-            )}
-            <span className="score-panel__chip score-panel__chip--neutral">
-              Budget : {formatBudgetEur(budget, idea.budgetEstime)}
-            </span>
-            {idea.beneficesAttendus && (
-              <span className="score-panel__chip score-panel__chip--neutral">
-                Bénéfices : {idea.beneficesAttendus}
+          <div className="score-context">
+            <div className="score-context__tags">
+              {idea.theme && (
+                <span className="score-context__tag score-context__tag--theme">
+                  {idea.theme}
+                </span>
+              )}
+              <span className="score-context__tag">
+                {idea.direction || 'Direction non renseignée'}
               </span>
+              <span className="score-context__tag">
+                {idea.site || 'Site non renseigné'}
+              </span>
+              <span className="score-context__tag score-context__tag--budget">
+                Budget&nbsp;: {formatBudgetEur(budget, idea.budgetEstime)}
+              </span>
+            </div>
+
+            <p className="score-context__description">{idea.description}</p>
+
+            {idea.beneficesAttendus && (
+              <p className="score-context__benefit">
+                <strong>Bénéfices attendus&nbsp;:</strong> {idea.beneficesAttendus}
+              </p>
             )}
           </div>
 

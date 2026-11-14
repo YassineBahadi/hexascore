@@ -20,7 +20,7 @@ const SHORTLIST_TARGET = 8;
 
 export default function App() {
   const state = useIdeas();
-  const { filters, setFilters, reset, isActive } = useFilters();
+  const { filters, setFilters, reset } = useFilters();
   const { scores, get, upsert, startedCount } = useScores();
   const shortlist = useShortlist();
 
@@ -53,47 +53,62 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div className="app-header__inner">
-          <div>
-            <h1 className="app-title">HexaScore</h1>
-            <p className="app-subtitle">
-              Dépouillement du challenge innovation Hexavia
-            </p>
+  <div className="app-header__inner">
+    <div className="app-brand">
+      <h1 className="app-title">HexaScore</h1>
+      <p className="app-subtitle">
+        Challenge innovation · <strong>Hexavia</strong>
+      </p>
+    </div>
+
+    {state.status === 'success' && (
+      <>
+        <div className="app-progress">
+          <div className="app-progress__header">
+            <span className="app-progress__label">Progression</span>
+            <span className="app-progress__value">
+              {startedCount} / {state.ideas.length} notées
+            </span>
           </div>
-          {state.status === 'success' && (
-            <div className="app-header__badges">
-              <div className="app-header__meta">
-                {isActive
-                  ? `${filteredIdeas.length} / ${state.ideas.length} idées`
-                  : `${state.ideas.length} idées`}
-              </div>
-              <div className="app-header__meta app-header__meta--success">
-                {startedCount} / {state.ideas.length} notées
-              </div>
-              <button
-                type="button"
-                className="app-header__btn app-header__btn--warn"
-                onClick={() => setShowDuplicates(true)}
-                disabled={duplicateGroups.length === 0}
-              >
-                ⚠ Doublons ({duplicateGroups.length})
-              </button>
-              <button
-                type="button"
-                className={
-                  'app-header__btn app-header__btn--primary' +
-                  (isShortlistOverTarget
-                    ? ' app-header__btn--over-target'
-                    : '')
-                }
-                onClick={() => setShowShortlist(true)}
-              >
-                ★ Shortlist ({shortlist.count} / {SHORTLIST_TARGET})
-              </button>
-            </div>
-          )}
+          <div className="app-progress__bar">
+            <div
+              className="app-progress__fill"
+              style={{ width: `${(startedCount / state.ideas.length) * 100}%` }}
+            />
+          </div>
         </div>
-      </header>
+
+        <div className="app-actions">
+          <button
+            type="button"
+            className="app-action app-action--secondary"
+            onClick={() => setShowDuplicates(true)}
+            disabled={duplicateGroups.length === 0}
+          >
+            <span className="app-action__icon">⚠</span>
+            <span>
+              {duplicateGroups.length} doublon{duplicateGroups.length > 1 ? 's' : ''}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={
+              'app-action app-action--primary' +
+              (isShortlistOverTarget ? ' app-action--warn' : '')
+            }
+            onClick={() => setShowShortlist(true)}
+          >
+            <span className="app-action__icon">★</span>
+            <span>
+              Shortlist · {shortlist.count}/{SHORTLIST_TARGET}
+            </span>
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</header>
 
       <main className="app-main">
         {state.status === 'loading' && <LoadingState />}

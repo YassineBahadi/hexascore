@@ -155,15 +155,19 @@ function IdeaRow({
       <td className="idea-cell--budget">
         {formatBudgetEur(budget, idea.budgetEstime)}
       </td>
-      <td className="idea-cell--score">
-        {avg !== null ? (
-          <span className="score-badge score-badge--filled">
-            {formatAverage(avg)} / 5
-          </span>
-        ) : (
-          <span className="score-badge score-badge--empty">Noter</span>
-        )}
-      </td>
+     <td className="idea-cell--score">
+  {avg !== null ? (
+    <span className="score-pill" title={`Moyenne : ${formatAverage(avg)} / 5`}>
+      <span className="score-pill__value">{formatAverage(avg)}</span>
+      <span className="score-pill__unit">/5</span>
+    </span>
+  ) : (
+    <span className="score-empty" aria-hidden="true">
+      <span className="score-empty__plus">+</span>
+      <span className="score-empty__label">Noter</span>
+    </span>
+  )}
+</td>
       <td
         className="idea-cell--shortlist"
         onClick={(e) => e.stopPropagation()}
