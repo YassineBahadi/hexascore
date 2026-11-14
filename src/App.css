@@ -109,3 +109,11 @@
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   font-size: 0.9em;
 }
+
+.app-header__meta {
+  /* ... propriétés existantes inchangées ... */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  min-width: 80px;          /* ← ajoute */
+  text-align: right;        /* ← ajoute */
+}

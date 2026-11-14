@@ -1,0 +1,113 @@
+.filter-bar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-end;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-bar__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  min-width: 150px;
+}
+
+.filter-bar__search {
+  flex: 1 1 240px;
+}
+
+.filter-bar__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-bar__select,
+.filter-bar__input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.filter-bar__select:hover,
+.filter-bar__input:hover {
+  border-color: var(--color-text-light);
+}
+
+.filter-bar__select:focus,
+.filter-bar__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.filter-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
+.filter-bar__count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.filter-bar__count strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.filter-bar__count-sep {
+  color: var(--color-text-light);
+  margin: 0 2px;
+}
+
+.filter-bar__reset {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.filter-bar__reset:hover:not(:disabled) {
+  background: var(--color-bg);
+  border-color: var(--color-text-light);
+}
+
+.filter-bar__reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Sur petits écrans, les actions passent à la ligne */
+@media (max-width: 768px) {
+  .filter-bar__actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .filter-bar__field {
+    min-width: 130px;
+  }
+}
