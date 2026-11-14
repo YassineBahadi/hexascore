@@ -1,7 +1,13 @@
-// import './App.css';
+import './styles/global.css'
 
-import './styles/global.css';
+import { useIdeas } from './hooks/useIdeas';
+import { IdeaTable } from './components/IdeaTable/IdeaTable';
+import { LoadingState } from './components/LoadingState';
+import { ErrorState } from './components/ErrorState';
+
 export default function App() {
+  const state = useIdeas();
+
   return (
     <div className="app">
       <header className="app-header">
@@ -12,19 +18,18 @@ export default function App() {
               Dépouillement du challenge innovation Hexavia
             </p>
           </div>
+          {state.status === 'success' && (
+            <div className="app-header__meta">
+              {state.ideas.length} idées
+            </div>
+          )}
         </div>
       </header>
 
       <main className="app-main">
-        <div className="empty-state">
-          <h2 className="empty-state__title">
-            Prêt à charger les idées
-          </h2>
-          <p className="empty-state__text">
-            La prochaine étape affichera ici les 40 idées déposées par
-            les collaborateurs Hexavia.
-          </p>
-        </div>
+        {state.status === 'loading' && <LoadingState />}
+        {state.status === 'error' && <ErrorState message={state.message} />}
+        {state.status === 'success' && <IdeaTable ideas={state.ideas} />}
       </main>
     </div>
   );
