@@ -15,6 +15,7 @@ import { ErrorState } from './components/ErrorState';
 import { ScorePanel } from './components/ScorePanel/ScorePanel';
 import { DuplicatesPanel } from './components/DuplicatesPanel/DuplicatesPanel';
 import { ShortlistPanel } from './components/ShortlistPanel/ShortlistPanel';
+import { Analytics } from '@vercel/analytics/react';
 
 const SHORTLIST_TARGET = 8;
 
@@ -159,6 +160,7 @@ export default function App() {
           onClose={() => setShowShortlist(false)}
         />
       )}
+      <Analytics />
     </div>
   );
 }
