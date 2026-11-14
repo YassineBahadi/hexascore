@@ -6,7 +6,7 @@ Outil de dépouillement du challenge innovation Hexavia, pour les consultants IN
 
 ## Aperçu
 
-**Application en ligne** : À REMPLACER — `https://hexascore-xxx.vercel.app`
+**Application en ligne** : À REMPLACER — `https://hexascore.vercel.app/`
 
 ![Tableau principal](docs/screenshot-main.png)
 
