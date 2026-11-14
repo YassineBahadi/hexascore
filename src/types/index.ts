@@ -52,3 +52,23 @@ export const CRITERION_LABELS: Record<ScoreCriterion, string> = {
   alignement: 'Alignement stratégique',
   innovation: 'Caractère innovant',
 };
+
+
+/** État des filtres de la vue principale. '' = pas de filtre. */
+export interface Filters {
+  search: string;
+  direction: string;
+  site: string;
+  theme: string;
+}
+
+/** Valeur sentinelle pour filtrer les idées au champ vide. */
+export const EMPTY_FILTER = '__empty__';
+
+/** État initial des filtres : aucun filtre actif. */
+export const EMPTY_FILTERS: Filters = {
+  search: '',
+  direction: '',
+  site: '',
+  theme: '',
+};
