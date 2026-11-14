@@ -1,5 +1,5 @@
 import type { KeyboardEvent, ReactNode } from 'react';
-import type { Idea, Score } from '../../types';
+import type { DuplicateGroup, Idea, Score } from '../../types';
 import {
   formatBudgetEur,
   formatDateFr,
@@ -7,15 +7,22 @@ import {
   parseDateToIso,
 } from '../../lib/formatters';
 import { averageScore, formatAverage } from '../../lib/scores';
+import { findDuplicateGroup } from '../../lib/duplicates';
 import './IdeaTable.css';
 
 interface IdeaTableProps {
   ideas: Idea[];
   scores: Record<string, Score>;
+  duplicateGroups: DuplicateGroup[];
   onSelectIdea: (idea: Idea) => void;
 }
 
-export function IdeaTable({ ideas, scores, onSelectIdea }: IdeaTableProps) {
+export function IdeaTable({
+  ideas,
+  scores,
+  duplicateGroups,
+  onSelectIdea,
+}: IdeaTableProps) {
   if (ideas.length === 0) {
     return (
       <div className="empty-state">
@@ -48,6 +55,7 @@ export function IdeaTable({ ideas, scores, onSelectIdea }: IdeaTableProps) {
               key={idea.id}
               idea={idea}
               score={scores[idea.id] ?? null}
+              duplicateGroup={findDuplicateGroup(idea.id, duplicateGroups)}
               onSelect={onSelectIdea}
             />
           ))}
@@ -62,13 +70,21 @@ export function IdeaTable({ ideas, scores, onSelectIdea }: IdeaTableProps) {
 interface IdeaRowProps {
   idea: Idea;
   score: Score | null;
+  duplicateGroup: DuplicateGroup | null;
   onSelect: (idea: Idea) => void;
 }
 
-function IdeaRow({ idea, score, onSelect }: IdeaRowProps) {
+function IdeaRow({ idea, score, duplicateGroup, onSelect }: IdeaRowProps) {
   const dateIso = parseDateToIso(idea.dateDepot);
   const budget = parseBudget(idea.budgetEstime);
   const avg = score ? averageScore(score) : null;
+
+  const otherIds = duplicateGroup
+    ? duplicateGroup.ideaIds.filter((id) => id !== idea.id)
+    : [];
+  const duplicateTitle = otherIds.length
+    ? `Doublon probable de : ${otherIds.join(', ')}`
+    : undefined;
 
   const handleClick = () => onSelect(idea);
   const handleKey = (e: KeyboardEvent<HTMLTableRowElement>) => {
@@ -92,6 +108,15 @@ function IdeaRow({ idea, score, onSelect }: IdeaRowProps) {
         <div className="idea-meta">
           <span className="idea-id">{idea.id}</span>
           {dateIso && <span>Déposée le {formatDateFr(dateIso)}</span>}
+          {duplicateGroup && (
+            <span
+              className="dup-badge"
+              title={duplicateTitle}
+              aria-label={duplicateTitle}
+            >
+              ⚠ Doublon
+            </span>
+          )}
         </div>
         <div className="idea-description">{idea.description}</div>
       </td>
