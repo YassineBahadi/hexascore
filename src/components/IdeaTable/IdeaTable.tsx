@@ -14,6 +14,8 @@ interface IdeaTableProps {
   ideas: Idea[];
   scores: Record<string, Score>;
   duplicateGroups: DuplicateGroup[];
+  shortlistIds: string[];
+  onToggleShortlist: (ideaId: string) => void;
   onSelectIdea: (idea: Idea) => void;
 }
 
@@ -21,6 +23,8 @@ export function IdeaTable({
   ideas,
   scores,
   duplicateGroups,
+  shortlistIds,
+  onToggleShortlist,
   onSelectIdea,
 }: IdeaTableProps) {
   if (ideas.length === 0) {
@@ -47,6 +51,7 @@ export function IdeaTable({
             <th>Thème</th>
             <th>Budget</th>
             <th>Note</th>
+            <th className="idea-cell--shortlist">Shortlist</th>
           </tr>
         </thead>
         <tbody>
@@ -56,6 +61,8 @@ export function IdeaTable({
               idea={idea}
               score={scores[idea.id] ?? null}
               duplicateGroup={findDuplicateGroup(idea.id, duplicateGroups)}
+              isInShortlist={shortlistIds.includes(idea.id)}
+              onToggleShortlist={onToggleShortlist}
               onSelect={onSelectIdea}
             />
           ))}
@@ -71,10 +78,19 @@ interface IdeaRowProps {
   idea: Idea;
   score: Score | null;
   duplicateGroup: DuplicateGroup | null;
+  isInShortlist: boolean;
+  onToggleShortlist: (ideaId: string) => void;
   onSelect: (idea: Idea) => void;
 }
 
-function IdeaRow({ idea, score, duplicateGroup, onSelect }: IdeaRowProps) {
+function IdeaRow({
+  idea,
+  score,
+  duplicateGroup,
+  isInShortlist,
+  onToggleShortlist,
+  onSelect,
+}: IdeaRowProps) {
   const dateIso = parseDateToIso(idea.dateDepot);
   const budget = parseBudget(idea.budgetEstime);
   const avg = score ? averageScore(score) : null;
@@ -96,7 +112,7 @@ function IdeaRow({ idea, score, duplicateGroup, onSelect }: IdeaRowProps) {
 
   return (
     <tr
-      className="idea-row"
+      className={`idea-row${isInShortlist ? ' idea-row--selected' : ''}`}
       tabIndex={0}
       role="button"
       aria-label={`Noter ${idea.titre}`}
@@ -147,6 +163,32 @@ function IdeaRow({ idea, score, duplicateGroup, onSelect }: IdeaRowProps) {
         ) : (
           <span className="score-badge score-badge--empty">Noter</span>
         )}
+      </td>
+      <td
+        className="idea-cell--shortlist"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className={`shortlist-btn${isInShortlist ? ' shortlist-btn--active' : ''}`}
+          aria-pressed={isInShortlist}
+          aria-label={
+            isInShortlist
+              ? `Retirer ${idea.titre} de la shortlist`
+              : `Ajouter ${idea.titre} à la shortlist`
+          }
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleShortlist(idea.id);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+            }
+          }}
+        >
+          {isInShortlist ? '✓' : '+'}
+        </button>
       </td>
     </tr>
   );
