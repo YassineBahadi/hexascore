@@ -117,3 +117,17 @@
   min-width: 80px;          /* ← ajoute */
   text-align: right;        /* ← ajoute */
 }
+
+
+.app-header__badges {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.app-header__meta--success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: transparent;
+  font-weight: 600;
+}

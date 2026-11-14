@@ -100,3 +100,41 @@
 .text-muted {
   color: var(--color-text-light);
 }
+
+/* Ligne cliquable — affordance et accessibilité */
+.idea-row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.idea-row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+  background: var(--color-primary-light);
+}
+
+/* Colonne Note */
+.idea-cell--score {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.score-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.score-badge--filled {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.score-badge--empty {
+  color: var(--color-text-light);
+  font-weight: 400;
+}

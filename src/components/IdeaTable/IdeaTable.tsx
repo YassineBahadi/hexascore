@@ -1,25 +1,28 @@
-import type { ReactNode } from 'react';
-
+import type { KeyboardEvent, ReactNode } from 'react';
+import type { Idea, Score } from '../../types';
 import {
   formatBudgetEur,
   formatDateFr,
   parseBudget,
   parseDateToIso,
 } from '../../lib/formatters';
+import { averageScore, formatAverage } from '../../lib/scores';
 import './IdeaTable.css';
-import type { Idea } from '../../types';
 
 interface IdeaTableProps {
   ideas: Idea[];
+  scores: Record<string, Score>;
+  onSelectIdea: (idea: Idea) => void;
 }
 
-export function IdeaTable({ ideas }: IdeaTableProps) {
+export function IdeaTable({ ideas, scores, onSelectIdea }: IdeaTableProps) {
   if (ideas.length === 0) {
     return (
       <div className="empty-state">
         <h2 className="empty-state__title">Aucune idée à afficher</h2>
         <p className="empty-state__text">
-          Le fichier a été chargé mais ne contient aucune idée valide.
+          Aucune idée ne correspond aux filtres actifs. Modifie ou
+          réinitialise les filtres pour en voir davantage.
         </p>
       </div>
     );
@@ -36,11 +39,17 @@ export function IdeaTable({ ideas }: IdeaTableProps) {
             <th>Site</th>
             <th>Thème</th>
             <th>Budget</th>
+            <th>Note</th>
           </tr>
         </thead>
         <tbody>
           {ideas.map((idea) => (
-            <IdeaRow key={idea.id} idea={idea} />
+            <IdeaRow
+              key={idea.id}
+              idea={idea}
+              score={scores[idea.id] ?? null}
+              onSelect={onSelectIdea}
+            />
           ))}
         </tbody>
       </table>
@@ -50,19 +59,39 @@ export function IdeaTable({ ideas }: IdeaTableProps) {
 
 /* ---------------------------------------------------------------- */
 
-function IdeaRow({ idea }: { idea: Idea }) {
+interface IdeaRowProps {
+  idea: Idea;
+  score: Score | null;
+  onSelect: (idea: Idea) => void;
+}
+
+function IdeaRow({ idea, score, onSelect }: IdeaRowProps) {
   const dateIso = parseDateToIso(idea.dateDepot);
   const budget = parseBudget(idea.budgetEstime);
+  const avg = score ? averageScore(score) : null;
+
+  const handleClick = () => onSelect(idea);
+  const handleKey = (e: KeyboardEvent<HTMLTableRowElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(idea);
+    }
+  };
 
   return (
-    <tr>
+    <tr
+      className="idea-row"
+      tabIndex={0}
+      role="button"
+      aria-label={`Noter ${idea.titre}`}
+      onClick={handleClick}
+      onKeyDown={handleKey}
+    >
       <td className="idea-cell--title">
         <div className="idea-title">{idea.titre}</div>
         <div className="idea-meta">
           <span className="idea-id">{idea.id}</span>
-          {dateIso && (
-            <span>Déposée le {formatDateFr(dateIso)}</span>
-          )}
+          {dateIso && <span>Déposée le {formatDateFr(dateIso)}</span>}
         </div>
         <div className="idea-description">{idea.description}</div>
       </td>
@@ -84,6 +113,15 @@ function IdeaRow({ idea }: { idea: Idea }) {
       </td>
       <td className="idea-cell--budget">
         {formatBudgetEur(budget, idea.budgetEstime)}
+      </td>
+      <td className="idea-cell--score">
+        {avg !== null ? (
+          <span className="score-badge score-badge--filled">
+            {formatAverage(avg)} / 5
+          </span>
+        ) : (
+          <span className="score-badge score-badge--empty">Noter</span>
+        )}
       </td>
     </tr>
   );
