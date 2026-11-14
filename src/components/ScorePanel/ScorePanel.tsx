@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Idea, Score, ScoreCriterion } from '../../types';
 import { CRITERION_LABELS } from '../../types';
 import { CRITERIA, averageScore, emptyScore } from '../../lib/scores';
+import { suggestScore } from '../../lib/aiSimulation';
 import { formatBudgetEur, parseBudget } from '../../lib/formatters';
 import './ScorePanel.css';
 
@@ -21,13 +22,15 @@ export function ScorePanel({
   const [form, setForm] = useState<Score>(
     () => initialScore ?? emptyScore(idea.id),
   );
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
 
-  // Réinitialise le formulaire si on change d'idée (nouveau clic).
   useEffect(() => {
     setForm(initialScore ?? emptyScore(idea.id));
+    setSuggestionError(null);
+    setIsSuggesting(false);
   }, [idea.id, initialScore]);
 
-  // Bloque le scroll du body pendant l'ouverture.
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -36,7 +39,6 @@ export function ScorePanel({
     };
   }, []);
 
-  // Fermeture par Échap.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -45,8 +47,44 @@ export function ScorePanel({
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  /** Modifie un critère manuellement — désactive le flag IA. */
   const setCriterion = (criterion: ScoreCriterion, value: number | null) => {
-    setForm((prev) => ({ ...prev, [criterion]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [criterion]: value,
+      suggestedByAi: false,
+    }));
+  };
+
+  const setJustification = (value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      justification: value,
+      suggestedByAi: false,
+    }));
+  };
+
+  const handleSuggest = async () => {
+    setIsSuggesting(true);
+    setSuggestionError(null);
+    try {
+      const suggestion = await suggestScore(idea);
+      setForm((prev) => ({
+        ...prev,
+        impact: suggestion.impact,
+        faisabilite: suggestion.faisabilite,
+        alignement: suggestion.alignement,
+        innovation: suggestion.innovation,
+        justification: suggestion.justification,
+        suggestedByAi: true,
+      }));
+    } catch {
+      setSuggestionError(
+        'La suggestion IA a échoué. Vous pouvez noter manuellement.',
+      );
+    } finally {
+      setIsSuggesting(false);
+    }
   };
 
   const handleSave = () => {
@@ -106,6 +144,37 @@ export function ScorePanel({
             )}
           </div>
 
+          {form.suggestedByAi && (
+            <div className="score-panel__ai-banner" role="status">
+              <span className="score-panel__ai-icon" aria-hidden="true">💡</span>
+              <span>
+                <strong>Suggestion IA</strong> — proposition de notation que
+                vous pouvez corriger librement. Le texte de la justification
+                est modifiable.
+              </span>
+            </div>
+          )}
+
+          {suggestionError && (
+            <div className="score-panel__ai-error" role="alert">
+              {suggestionError}
+            </div>
+          )}
+
+          <div className="score-panel__suggest-row">
+            <button
+              type="button"
+              className="btn btn--ai"
+              onClick={handleSuggest}
+              disabled={isSuggesting}
+            >
+              {isSuggesting ? 'Suggestion en cours…' : '✨ Suggérer une note'}
+            </button>
+            <span className="score-panel__suggest-hint">
+              Remplit les 4 critères et la justification à partir de l'idée.
+            </span>
+          </div>
+
           <h3 className="score-panel__section-title">
             Notez chaque critère de 1 à 5
           </h3>
@@ -122,7 +191,8 @@ export function ScorePanel({
 
           <div className="score-panel__justification">
             <label htmlFor="justification" className="score-panel__label">
-              Justification <span className="score-panel__label-hint">(optionnel)</span>
+              Justification{' '}
+              <span className="score-panel__label-hint">(optionnel)</span>
             </label>
             <textarea
               id="justification"
@@ -130,9 +200,7 @@ export function ScorePanel({
               rows={4}
               placeholder="Pourquoi ces notes ? Ce texte pourra être repris dans la shortlist."
               value={form.justification}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, justification: e.target.value }))
-              }
+              onChange={(e) => setJustification(e.target.value)}
             />
           </div>
 

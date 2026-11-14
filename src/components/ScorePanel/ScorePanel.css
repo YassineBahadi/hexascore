@@ -290,3 +290,68 @@
   background: var(--color-surface);
   border-color: var(--color-text-light);
 }
+
+/* ================================================================ */
+/* BANDEAU ET BOUTON IA                                              */
+/* ================================================================ */
+
+.score-panel__ai-banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-primary-light);
+  color: var(--color-primary-hover);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.score-panel__ai-icon {
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
+.score-panel__ai-error {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.score-panel__suggest-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.score-panel__suggest-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.btn--ai {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.btn--ai:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn--ai:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn--ai:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
