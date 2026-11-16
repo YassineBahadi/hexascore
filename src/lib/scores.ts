@@ -1,5 +1,18 @@
 import type { Score, ScoreCriterion } from '../types';
 
+
+
+/**
+ * Palier de couleur pour une moyenne (design.md §4.1).
+ * 1: < 2.5 · 2: 2.5–3.4 · 3: 3.5–4.2 · 4: ≥ 4.3
+ */
+export function getScoreTier(avg: number): 1 | 2 | 3 | 4 {
+  if (avg < 2.5) return 1;
+  if (avg < 3.5) return 2;
+  if (avg < 4.3) return 3;
+  return 4;
+}
+
 /** Ordre canonique des critères — utilisé partout dans l'UI. */
 export const CRITERIA: ScoreCriterion[] = [
   'impact',
@@ -60,5 +73,11 @@ export function formatAverage(avg: number | null): string {
  * Utilisé pour décider si on garde ou supprime une entrée.
  */
 export function isScoreBlank(score: Score): boolean {
-  return !isScoreStarted(score) && score.justification.trim() === '';
+  return (
+    score.impact === null &&
+    score.faisabilite === null &&
+    score.alignement === null &&
+    score.innovation === null &&
+    score.justification.trim() === ''
+  );
 }

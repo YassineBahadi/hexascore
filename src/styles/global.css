@@ -1,51 +1,56 @@
 @import './variables.css';
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg text-text;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* Focus visible unifié (design.md §4.3) */
+  *:focus-visible {
+    outline: 2px solid theme('colors.primary.DEFAULT');
+    outline-offset: 2px;
+  }
+
+  /* Chiffres tabulaires partout où c'est pertinent */
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-html {
-  font-size: 16px;
-}
-
-body {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-base);
-  color: var(--color-text);
-  background: var(--color-bg);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-button {
-  font-family: inherit;
-  font-size: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-input,
-select,
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-}
-
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-h1, h2, h3, h4 {
-  line-height: 1.2;
-  font-weight: 600;
-}
-
+/* Legacy tokens: variables.css (--color-*) encore utilisés par les modales */
+/* Migration progressive : Session 11-12 */

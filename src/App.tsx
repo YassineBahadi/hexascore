@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import './App.css';
 import type { Idea } from './types';
 import { useIdeas } from './hooks/useIdeas';
 import { useFilters } from './hooks/useFilters';
@@ -21,7 +20,7 @@ const SHORTLIST_TARGET = 8;
 
 export default function App() {
   const state = useIdeas();
-  const { filters, setFilters, reset } = useFilters();
+  const { filters, setFilters, reset, isActive } = useFilters();
   const { scores, get, upsert, startedCount } = useScores();
   const shortlist = useShortlist();
 
@@ -49,69 +48,93 @@ export default function App() {
     [shortlist.ids, ideasById, scores],
   );
 
-  const isShortlistOverTarget = shortlist.count > SHORTLIST_TARGET;
+  const totalIdeas = ideas.length;
+  const progressPct = totalIdeas > 0 ? Math.round((startedCount / totalIdeas) * 100) : 0;
+  const shortlistIsFull = shortlist.count >= SHORTLIST_TARGET;
+  const shortlistIsNearFull = shortlist.count === SHORTLIST_TARGET - 1;
 
   return (
-    <div className="app">
-      <header className="app-header">
-  <div className="app-header__inner">
-    <div className="app-brand">
-      <h1 className="app-title">HexaScore</h1>
-      <p className="app-subtitle">
-        Challenge innovation · <strong>Hexavia</strong>
-      </p>
-    </div>
+    <div className="min-h-screen flex flex-col">
+      <header className="sticky top-0 z-30 bg-surface border-b border-border">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-3 lg:py-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] items-center gap-3 lg:gap-8">
+            {/* Brand */}
+            <div>
+              <h1 className="text-xl font-bold text-text tracking-tight leading-tight">
+                HexaScore
+              </h1>
+              <p className="text-xs text-text-muted mt-0.5">
+                Challenge innovation · <strong className="text-text font-semibold">Hexavia</strong>
+              </p>
+            </div>
 
-    {state.status === 'success' && (
-      <>
-        <div className="app-progress">
-          <div className="app-progress__header">
-            <span className="app-progress__label">Progression</span>
-            <span className="app-progress__value">
-              {startedCount} / {state.ideas.length} notées
-            </span>
-          </div>
-          <div className="app-progress__bar">
-            <div
-              className="app-progress__fill"
-              style={{ width: `${(startedCount / state.ideas.length) * 100}%` }}
-            />
+            {/* Progression */}
+            {state.status === 'success' && (
+              <div
+                className="hidden lg:flex flex-col gap-1 max-w-md w-full justify-self-center"
+                role="progressbar"
+                aria-valuenow={startedCount}
+                aria-valuemin={0}
+                aria-valuemax={totalIdeas}
+                aria-label="Progression de la notation"
+              >
+                <div className="flex justify-between items-baseline text-xs">
+                  <span className="text-text-muted font-semibold uppercase tracking-wider">
+                    Progression
+                  </span>
+                  <span className="text-text font-semibold tabular-nums">
+                    {startedCount} / {totalIdeas} · {progressPct}%
+                  </span>
+                </div>
+                <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-purple-600 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            {state.status === 'success' && (
+              <div className="flex gap-2 items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowDuplicates(true)}
+                  disabled={duplicateGroups.length === 0}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border border-border bg-surface text-text-muted hover:bg-surface-2 hover:text-text transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  <span aria-hidden="true">⚠</span>
+                  <span>
+                    {duplicateGroups.length} doublon{duplicateGroups.length > 1 ? 's' : ''}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowShortlist(true)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    shortlistIsFull
+                      ? 'bg-warning text-white hover:bg-warning/90'
+                      : shortlistIsNearFull
+                        ? 'bg-warning text-white hover:bg-warning/90'
+                        : 'bg-primary text-white hover:bg-primary-hover'
+                  }`}
+                >
+                  <span aria-hidden="true">★</span>
+                  <span>
+                    {shortlistIsFull
+                      ? `Complète · ${shortlist.count}/${SHORTLIST_TARGET}`
+                      : `Shortlist · ${shortlist.count}/${SHORTLIST_TARGET}`}
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
+      </header>
 
-        <div className="app-actions">
-          <button
-            type="button"
-            className="app-action app-action--secondary"
-            onClick={() => setShowDuplicates(true)}
-            disabled={duplicateGroups.length === 0}
-          >
-            <span className="app-action__icon">⚠</span>
-            <span>
-              {duplicateGroups.length} doublon{duplicateGroups.length > 1 ? 's' : ''}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className={
-              'app-action app-action--primary' +
-              (isShortlistOverTarget ? ' app-action--warn' : '')
-            }
-            onClick={() => setShowShortlist(true)}
-          >
-            <span className="app-action__icon">★</span>
-            <span>
-              Shortlist · {shortlist.count}/{SHORTLIST_TARGET}
-            </span>
-          </button>
-        </div>
-      </>
-    )}
-  </div>
-</header>
-
-      <main className="app-main">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 lg:px-8 py-6 lg:py-8">
         {state.status === 'loading' && <LoadingState />}
         {state.status === 'error' && <ErrorState message={state.message} />}
         {state.status === 'success' && (
